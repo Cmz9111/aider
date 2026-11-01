@@ -20,3 +20,19 @@ class TestDiagnosticFilenames(unittest.TestCase):
             find_filenames_and_linenums("other.config.py:12: error", [".config.py"]),
             {},
         )
+
+    def test_rejects_suffixes_of_other_filenames(self):
+        for prefix in ["other-", "other.", "other+", "directory/"]:
+            with self.subTest(prefix=prefix):
+                self.assertEqual(
+                    find_filenames_and_linenums(prefix + ".config.py:12: error", [".config.py"]),
+                    {},
+                )
+
+    def test_diagnostic_delimiters(self):
+        for prefix in ["", " ", "\t", "\n", "'", '"', "(", "["]:
+            with self.subTest(prefix=prefix):
+                self.assertEqual(
+                    find_filenames_and_linenums(prefix + ".config.py:12: error", [".config.py"]),
+                    {".config.py": {12}},
+                )
