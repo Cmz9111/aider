@@ -274,7 +274,10 @@ def find_filenames_and_linenums(text, fnames):
     Search text for all occurrences of <filename>:\\d+ and make a list of them
     where <filename> is one of the filenames in the list `fnames`.
     """
-    pattern = re.compile(r"((?<!\w)(?:" + "|".join(re.escape(fname) for fname in fnames) + r"):\d+\b)")
+    # A filename must start at a diagnostic delimiter, not inside another path.
+    pattern = re.compile(
+        r"((?<![^\s'\"(\[])(?:" + "|".join(re.escape(fname) for fname in fnames) + r"):\d+\b)"
+    )
     matches = pattern.findall(text)
     result = {}
     for match in matches:
